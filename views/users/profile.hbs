@@ -1,36 +1,102 @@
-<div class="row mb-5">
-  <div class="col-md-4">
-    <img class="img-responsive center-block mb-5"
-      src="{{#if user.image}}{{user.image}}{{else}}https://i.imgur.com/9qWUEba.jpeg{{/if}}"
-      style="width: 250px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
-  </div>
-  <div class="col-md-8">
-    <p class="my-4 text-bold h4">{{user.name}}</p>
-    <p class="my-4">{{user.email}}</p>
-    {{#if_isMatch user.id reqUser.id}}<a class="btn btn-primary" href="/users/{{user.id}}/edit">edit</a>{{/if_isMatch}}
-  </div>
-</div>
-<hr>
-<div class="row mb-5">
+<div class="row">
   <div class="col-md-12">
-    <h5 class="my-4">{{commentCounts}} 已評論餐廳</h5>
-  </div>
-  {{#each user.Comments}}
-  <div class="col-md-2">
-    <div class="card mb-4 shadow-sm">
-      <a href="/restaurants/{{this.Restaurant.id}}">
-        <img class="card-img-top img-fluid" src="{{this.Restaurant.image}}" alt="Card image cap"
-          style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
-      </a>
-      <div class="card-body">
-        <p class="card-text">
-          <a href="/restaurants/{{this.Restaurant.id}}">
-            {{this.Restaurant.name}}
-          </a>
-        </p>
-        <span class="badge bg-secondary">{{this.Restaurant.Category.name}}</span>
+    <div class="card mb-3">
+      <div class="row g-0">
+        <div class="col-md-4">
+          <img src="{{#if user.image}}{{user.image}}{{else}}https://i.imgur.com/9qWUEba.jpeg{{/if}}"
+            class="img-fluid rounded-start">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body m-4">
+            <h5 class="card-title">{{user.name}}</h5>
+            <p class="card-text"><small class="text-muted">{{user.email}}</small></p>
+            <ul style="list-style-type: none; padding: 0;">
+              <li>{{user.Comments.length}} 已評論餐廳</li>
+              <li>{{user.FavoritedRestaurants.length}} 收藏的餐廳</li>
+              <li>{{user.Followings.length}} followings (追蹤者)</li>
+              <li>{{user.Followers.length}} followers (追隨者)</li>
+            </ul>
+            {{#if_isMatch user.id reqUser.id}}<a class="btn btn-primary"
+              href="/users/{{user.id}}/edit">edit</a>{{/if_isMatch}}
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  {{/each}}
+</div>
+
+<div class="row mt-2">
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-header">
+        {{user.Followings.length}} followings (追蹤者)
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {{#each user.Followings}}
+          <div class="col-sm-2 p-1">
+            <a href="/users/{{this.id}}">
+              <img class="card-img-top img-fluid" src="{{this.image}}" alt="Card image cap"
+                style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+            </a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+    <div class="card mb-4">
+      <div class="card-header">
+        {{user.Followers.length}} followers (追隨者)
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {{#each user.Followers}}
+          <div class="col-sm-2 p-1">
+            <a href="/users/{{this.id}}">
+              <img class="card-img-top img-fluid" src="{{this.image}}" alt="Card image cap"
+                style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+            </a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header">
+        {{user.Comments.length}} 已評論餐廳
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {{#each user.Comments}}
+          <div class="col-sm-1 p-1">
+            <a href="/restaurants/{{this.Restaurant.id}}">
+              <img class="card-img-top img-fluid" src="{{this.Restaurant.image}}" alt="Card image cap"
+                style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+            </a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+    <div class="card mb-4">
+      <div class="card-header">
+        {{user.FavoritedRestaurants.length}} 收藏的餐廳
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {{#each user.FavoritedRestaurants}}
+          <div class="col-sm-1 p-1">
+            <a href="/restaurants/{{this.id}}">
+              <img class="card-img-top img-fluid" src="{{this.image}}" alt="Card image cap"
+                style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+            </a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

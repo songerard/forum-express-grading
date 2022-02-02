@@ -48,12 +48,33 @@ const userController = {
   getUser: (req, res, next) => {
     return User.findByPk(req.params.id, {
       include: [
-        { model: Comment, include: { model: Restaurant, include: Category } }
+        {
+          model: Comment,
+          include: { model: Restaurant, include: Category }
+        },
+        {
+          model: Restaurant,
+          as: 'FavoritedRestaurants',
+          include: Category
+        },
+        { model: Restaurant, as: 'LikedRestaurants' },
+        { model: User, as: 'Followers' },
+        { model: User, as: 'Followings' }
       ]
     })
       .then(user => {
         if (!user) throw new Error("User didn't exist!")
-        res.render('users/profile', { user: user.toJSON(), reqUser: req.user })
+
+        const result = user.toJSON()
+        // To reduce Comments to unique restaurant list:
+        // set initial accumulator is an empty array, then for each comment,
+        // if its restaurantId is found in accumulator then return empty array,
+        // otherwise return this comment and concat in accumulator for next iteration
+        // for the whole user.Comments
+        result.Comments = result.Comments.reduce((accumulator, currentComment) =>
+          accumulator.concat(accumulator.find(y => y.restaurantId === currentComment.restaurantId) ? [] : [currentComment]), [])
+
+        res.render('users/profile', { user: result, reqUser: req.user })
       })
       .catch(err => next(err))
   },
