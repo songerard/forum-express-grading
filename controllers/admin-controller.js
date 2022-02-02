@@ -29,7 +29,7 @@ const adminController = {
         address,
         openingHours,
         description,
-        image: filePath || null,
+        image: filePath || process.env.IMAGE_PLACEHOLDER_URL,
         categoryId
       }))
       .then(() => {

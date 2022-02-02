@@ -24,7 +24,7 @@ const userController = {
           name: req.body.name,
           email: req.body.email,
           password: hash,
-          image: filePath || null
+          image: filePath || process.env.IMAGE_PLACEHOLDER_URL
         })
       })
       .then(() => {
