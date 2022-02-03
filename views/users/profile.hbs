@@ -3,8 +3,7 @@
     <div class="card mb-3">
       <div class="row g-0">
         <div class="col-md-4">
-          <img src="{{user.image}}"
-            class="img-fluid rounded-start">
+          <img src="{{user.image}}" class="img-fluid rounded-start">
         </div>
         <div class="col-md-8">
           <div class="card-body m-4">
@@ -18,6 +17,20 @@
             </ul>
             {{#if_isMatch user.id reqUser.id}}<a class="btn btn-primary"
               href="/users/{{user.id}}/edit">edit</a>{{/if_isMatch}}
+          </div>
+          <div class="card-body m-4">
+            {{#if_isMatch user.id reqUser.id}}
+            {{else}}
+            {{#if isFollowed }}
+            <form action="/following/{{user.id}}?_method=DELETE" method="POST" style="display: contents;">
+              <button type="submit" class="btn btn-danger">取消追蹤</button>
+            </form>
+            {{else}}
+            <form action="/following/{{user.id}}" method="POST" style="display: contents;">
+              <button type="submit" class="btn btn-primary">追蹤</button>
+            </form>
+            {{/if}}
+            {{/if_isMatch}}
           </div>
         </div>
       </div>

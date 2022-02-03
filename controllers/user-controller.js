@@ -74,7 +74,11 @@ const userController = {
         result.Comments = result.Comments.reduce((accumulator, currentComment) =>
           accumulator.concat(accumulator.find(y => y.restaurantId === currentComment.restaurantId) ? [] : [currentComment]), [])
 
-        res.render('users/profile', { user: result, reqUser: req.user })
+        res.render('users/profile', {
+          user: result,
+          reqUser: req.user,
+          isFollowed: req.user.Followings.some(f => f.id === user.id)
+        })
       })
       .catch(err => next(err))
   },
@@ -200,8 +204,7 @@ const userController = {
             isFollowed: req.user.Followings.some(f => f.id === user.id)
           }))
           .sort((a, b) => b.followerCount - a.followerCount)
-
-        res.render('top-users', { users: result })
+        res.render('top-users', { users: result, reqUser: req.user })
       })
       .catch(err => next(err))
   },
