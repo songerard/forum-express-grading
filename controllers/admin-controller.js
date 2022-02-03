@@ -1,13 +1,32 @@
 const { Restaurant, User, Category } = require('../models')
 const { imgurFileHandler } = require('../helpers/file-helpers')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 const adminController = {
   getRestaurants: (req, res, next) => {
-    return Restaurant.findAll({
-      raw: true,
-      nest: true,
-      include: [Category]
-    })
-      .then(restaurants => res.render('admin/restaurants', { restaurants }))
+    const DEFAULT_LIMIT = 20
+    const categoryId = Number(req.query.categoryId) || ''
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT
+    const offset = getOffset(limit, page)
+    return Promise.all([
+      Restaurant.findAndCountAll({
+        include: Category,
+        where: { ...categoryId ? { categoryId } : {} },
+        limit,
+        offset,
+        raw: true,
+        nest: true
+      }),
+      Category.findAll({ raw: true })
+    ])
+      .then(([restaurants, categories]) => {
+        return res.render('admin/restaurants', {
+          restaurants: restaurants.rows,
+          categories,
+          categoryId,
+          pagination: getPagination(limit, page, restaurants.count)
+        })
+      })
       .catch(err => next(err))
   },
   createRestaurant: (req, res, next) => {
@@ -97,10 +116,26 @@ const adminController = {
       .catch(err => next(err))
   },
   getUsers: (req, res, next) => {
-    return User.findAll({
-      raw: true
+    const DEFAULT_LIMIT = 20
+    const isAdmin = req.query.isAdmin === '' ? 'all' : isNaN(Number(req.query.isAdmin)) ? 'all' : req.query.isAdmin
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT
+    const offset = getOffset(limit, page)
+    const where = isAdmin === 'all' ? {} : { isAdmin }
+    return User.findAndCountAll({
+      where,
+      limit,
+      offset,
+      raw: true,
+      nest: true
     })
-      .then(users => res.render('admin/users', { users }))
+      .then(users => {
+        return res.render('admin/users', {
+          users: users.rows,
+          isAdmin,
+          pagination: getPagination(limit, page, users.count)
+        })
+      })
       .catch(err => next(err))
   },
   patchUser: (req, res, next) => {
@@ -115,7 +150,8 @@ const adminController = {
       })
       .then(() => {
         req.flash('success_messages', '使用者權限變更成功')
-        res.redirect('/admin/users')
+        const redirectPath = '/admin/users?page=' + req.query.page + '&isAdmin=' + req.query.isAdmin + '&limit=' + req.query.limit
+        res.redirect(redirectPath)
       })
       .catch(err => next(err))
   }

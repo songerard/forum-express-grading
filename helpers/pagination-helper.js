@@ -6,13 +6,15 @@ const getPagination = (limit = 10, page = 1, total = 50) => {
   const currentPage = page < 1 ? 1 : page > totalPage ? totalPage : page
   const prev = currentPage - 1 < 1 ? 1 : currentPage - 1
   const next = currentPage + 1 > totalPage ? totalPage : currentPage + 1
-
+  const limitOptions = [20, 50, 100]
   return {
     pages,
     totalPage,
     currentPage,
     prev,
-    next
+    next,
+    limit,
+    limitOptions
   }
 }
 
