@@ -9,9 +9,15 @@ const userController = {
   signUp: (req, res, next) => {
     if (req.body.password !== req.body.passwordCheck) throw new Error('Passwords do not match!')
 
-    User.findOne({ where: { email: req.body.email } })
-      .then(user => {
-        if (user) throw new Error('Email already exists!')
+    User.findAll({
+      $or: [
+        { where: { name: req.body.name } },
+        { where: { email: req.body.email } }
+      ]
+    })
+      .then(users => {
+        if (users.some(u => u.email === req.body.email)) throw new Error('Email already exists!')
+        if (users.some(u => u.name === req.body.name)) throw new Error('Name already exists!')
 
         const { file } = req
         return Promise.all([
@@ -93,21 +99,26 @@ const userController = {
   putUser: (req, res, next) => {
     const { name } = req.body
     if (!name) throw new Error('User name is required!')
-    const { file } = req
-    return Promise.all([
-      User.findByPk(req.params.id),
-      imgurFileHandler(file)
-    ])
-      .then(([user, filePath]) => {
-        if (!user) throw new Error("User didn't exist!")
-        return user.update({
-          name,
-          image: filePath || user.image
-        })
-      })
-      .then(() => {
-        req.flash('success_messages', '使用者資料編輯成功')
-        res.redirect(`/users/${req.params.id}`)
+    User.findOne({ where: { name } })
+      .then(user => {
+        if (user) throw new Error('Name already exists!')
+
+        const { file } = req
+        return Promise.all([
+          User.findByPk(req.params.id),
+          imgurFileHandler(file)
+        ])
+          .then(([user, filePath]) => {
+            if (!user) throw new Error("User didn't exist!")
+            return user.update({
+              name,
+              image: filePath || user.image
+            })
+          })
+          .then(() => {
+            req.flash('success_messages', '使用者資料編輯成功')
+            res.redirect(`/users/${req.params.id}`)
+          })
       })
       .catch(err => next(err))
   },
