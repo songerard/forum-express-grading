@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const { User, Restaurant, Category, Comment, Favorite, Like, Followship } = require('../models')
+const { User, Restaurant, Category, Comment, Favorite, Like, Followship, LikeComment } = require('../models')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 
 const userController = {
@@ -251,6 +251,39 @@ const userController = {
       .then(followship => {
         if (!followship) throw new Error("You haven't followed this user!")
         return followship.destroy()
+      })
+      .then(() => res.redirect('back'))
+      .catch(err => next(err))
+  },
+  likeComment: (req, res, next) => {
+    return LikeComment.findOne({
+      where: {
+        userId: req.user.id,
+        commentId: req.params.commentId
+      },
+      raw: true
+    })
+      .then(like => {
+        if (like) throw new Error("You are already liked this comment!'")
+
+        return LikeComment.create({
+          userId: req.user.id,
+          commentId: req.params.commentId
+        })
+      })
+      .then(() => res.redirect(`/restaurants/${req.params.restaurantId}`))
+      .catch(err => next(err))
+  },
+  unlikeComment: (req, res, next) => {
+    LikeComment.findOne({
+      where: {
+        userId: req.user.id,
+        commentId: req.params.commentId
+      }
+    })
+      .then(like => {
+        if (!like) throw new Error("You haven't liked this comment!")
+        return like.destroy()
       })
       .then(() => res.redirect('back'))
       .catch(err => next(err))

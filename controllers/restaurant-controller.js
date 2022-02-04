@@ -48,13 +48,30 @@ const restaurantController = {
     })
       .then(restaurant => {
         if (!restaurant) throw new Error("Restaurant didn't exist!")
-        return restaurant.increment('viewCounts')
+        return Promise.all([
+          restaurant.increment('viewCounts'),
+          User.findByPk(req.user.id, {
+            include: [
+              { model: Comment, as: 'LikedComments' }
+            ]
+          })
+        ])
       })
-      .then(restaurant => {
+      .then(([restaurant, user]) => {
         const isFavorited = restaurant.FavoritedUsers.some(f => f.id === req.user.id)
         const isLiked = restaurant.LikedUsers.some(liked => liked.id === req.user.id)
+
+        // assign commentIsLiked key into each comment by comparing with user's likedComment list
+        const userObj = user.toJSON()
+        const restaurantObj = restaurant.toJSON()
+        const commentsWithIsLike = restaurantObj.Comments.map(c => ({
+          ...c,
+          commentIsLiked: userObj.LikedComments.some(u => u.id === c.id)
+        }))
+        restaurantObj.Comments = commentsWithIsLike
+
         res.render('restaurant', {
-          restaurant: restaurant.toJSON(),
+          restaurant: restaurantObj,
           isFavorited,
           isLiked
         })
