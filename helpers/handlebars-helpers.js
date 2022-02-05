@@ -13,5 +13,9 @@ module.exports = {
     if (reqUser === undefined && user) return options.fn(this)
     if (reqUser) return options.fn(this)
   },
-  thisOrThat: (a, b) => a || b
+  thisOrThat: (a, b) => a || b,
+  minus: (a, b) => a - b,
+  if_greater: function (a, b, options) {
+    return a > b ? options.fn(this) : options.inverse(this)
+  }
 }

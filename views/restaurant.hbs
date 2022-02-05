@@ -47,33 +47,59 @@
   <button type="submit" class="btn btn-danger">Delete</button>
 </form>
 {{/if}}
-<blockquote class="blockquote mb-0">
-  <h4><a href="/users/{{this.User.id}}">{{this.User.name}}</a></h4>
-  <p>{{this.text}}</p>
-  <footer class="blockquote-footer">
-    <div class="row m-0">
-      <div class="col-sm-1">
-        {{#if this.commentIsLiked}}
-        <form action="/like/comments/{{this.id}}/restaurants/{{../restaurant.id}}?_method=DELETE" method="POST">
-          <button type="submit" class="btn btn-link text-success text-decoration-none p-0">
-            <i class="fas fa-thumbs-up"></i> {{this.commentLikeCounts}}
-          </button>
-        </form>
-        {{else}}
-        <form action="/like/comments/{{this.id}}/restaurants/{{../restaurant.id}}" method="POST">
-          <button type="submit" class="btn btn-link text-success text-decoration-none p-0">
-            <i class="far fa-thumbs-up"></i> {{this.commentLikeCounts}}
-          </button>
-        </form>
-        {{/if}}
-      </div>
-      <div class="col-sm-4">
-        {{relativeTimeFromNow this.createdAt}}
-      </div>
-    </div>
-  </footer>
-</blockquote>
-<hr />
+<div class="row">
+  <div class="col-{{minus this.layer 1}}">
+  </div>
+  <div class="col-{{minus 13 this.layer}}">
+    <blockquote class="blockquote mb-0">
+      <h4><a href="/users/{{this.User.id}}">{{this.User.name}}</a></h4>
+      <p>{{this.text}}</p>
+      <footer class="blockquote-footer">
+        <div class="row m-0">
+          <div class="col-sm-auto">
+            {{#if this.commentIsLiked}}
+            <form action="/like/comments/{{this.id}}/restaurants/{{../restaurant.id}}?_method=DELETE" method="POST">
+              <button type="submit" class="btn btn-link text-success text-decoration-none p-0">
+                <i class="fas fa-thumbs-up"></i> {{this.commentLikeCounts}}
+              </button>
+            </form>
+            {{else}}
+            <form action="/like/comments/{{this.id}}/restaurants/{{../restaurant.id}}" method="POST">
+              <button type="submit" class="btn btn-link text-success text-decoration-none p-0">
+                <i class="far fa-thumbs-up"></i> {{this.commentLikeCounts}}
+              </button>
+            </form>
+            {{/if}}
+          </div>
+          {{#if_greater 5 this.layer}}
+          <div class="col-sm-auto">
+            <button class="btn btn-link text-dark text-decoration-none p-0" id="show-reply-btn-{{this.id}}"
+              value="{{this.id}}" onclick="showReplyToComment(this.value)">回覆</button>
+          </div>
+          {{/if_greater}}
+          <div class="col-sm-auto">
+            {{relativeTimeFromNow this.createdAt}}
+          </div>
+        </div>
+      </footer>
+
+      {{!-- reply comment --}}
+      {{#if_greater 5 this.layer}}
+      <form class="row" id="reply-to-comment-{{this.id}}" style="display:none;" action="/comments/{{this.id}}/reply"
+        method="POST">
+        <div class="input-group mb-3">
+          <textarea class="form-control" placeholder="輸入回覆" name="text" rows="1"></textarea>
+          <input type="hidden" name="restaurantId" value="{{../restaurant.id}}" />
+          <button class="btn btn-primary" type="submit" id="reply-button">回覆</button>
+        </div>
+      </form>
+      {{/if_greater}}
+    </blockquote>
+    <hr />
+  </div>
+</div>
+
+
 {{/each}}
 
 <form action="/comments" method="POST">
@@ -85,3 +111,20 @@
   <button type="submit" class="btn btn-primary">Submit</button>
   <a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
 </form>
+
+
+<script>
+  function showReplyToComment(commentId) {
+    const textareaId = 'reply-to-comment-' + commentId;
+    const btnId = 'show-reply-btn-' + commentId;
+    const textarea = document.getElementById(textareaId);
+    const btn = document.getElementById(btnId);
+    if (textarea.style.display === "none") {
+      textarea.style.display = "block";
+      btn.innerText = "收起";
+    } else {
+      textarea.style.display = "none";
+      btn.innerText = "回覆";
+    }
+  }
+</script>

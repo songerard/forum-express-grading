@@ -72,7 +72,64 @@ const restaurantController = {
           commentIsLiked: userObj.LikedComments.some(u => u.id === c.id),
           commentLikeCounts: likeComments.filter(like => like.commentId === c.id).length
         })).sort((a, b) => b.commentLikeCounts - a.commentLikeCounts || b.createdAt - a.createdAt)
-        restaurantObj.Comments = commentsWithLike
+
+        // push comments into their layer array
+        const layer1 = []
+        const layer2 = []
+        const layer3 = []
+        const layer4 = []
+        const layer5 = []
+
+        commentsWithLike.forEach(c => {
+          switch (c.layer) {
+            case 1:
+              layer1.push(c)
+              break
+            case 2:
+              layer2.push(c)
+              break
+            case 3:
+              layer3.push(c)
+              break
+            case 4:
+              layer4.push(c)
+              break
+            case 5:
+              layer5.push(c)
+          }
+        })
+
+        // rearrange the sequence of comments and followed by their replies
+        const rearrangedComments = []
+        for (const L1 of layer1) {
+          rearrangedComments.push(L1)
+
+          for (const L2 of layer2) {
+            if (L2.replyCommentId === L1.id) {
+              rearrangedComments.push(L2)
+
+              for (const L3 of layer3) {
+                if (L3.replyCommentId === L2.id) {
+                  rearrangedComments.push(L3)
+
+                  for (const L4 of layer4) {
+                    if (L4.replyCommentId === L3.id) {
+                      rearrangedComments.push(L4)
+
+                      for (const L5 of layer5) {
+                        if (L5.replyCommentId === L4.id) {
+                          rearrangedComments.push(L5)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        restaurantObj.Comments = rearrangedComments
 
         res.render('restaurant', {
           restaurant: restaurantObj,
