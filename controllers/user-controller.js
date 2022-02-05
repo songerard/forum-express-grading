@@ -162,25 +162,21 @@ const userController = {
   },
   addLike: (req, res, next) => {
     const { restaurantId } = req.params
-    return Promise.all([
-      Restaurant.findByPk(restaurantId),
-      Like.findOne({
-        where: {
-          userId: req.user.id,
-          restaurantId
-        }
-      })
-    ])
-      .then(([restaurant, like]) => {
+    return Restaurant.findByPk(restaurantId)
+      .then(restaurant => {
         if (!restaurant) throw new Error("Restaurant didn't exist!")
-        if (like) throw new Error('You have liked this restaurant!')
 
-        return Like.create({
-          userId: req.user.id,
-          restaurantId
+        return Like.findOrCreate({
+          where: {
+            userId: req.user.id,
+            restaurantId
+          }
         })
       })
-      .then(() => res.redirect('back'))
+      .then(([like, created]) => {
+        if (!created) throw new Error("You have liked this restaurant!'")
+        res.redirect('back')
+      })
       .catch(err => next(err))
   },
   removeLike: (req, res, next) => {
@@ -196,7 +192,7 @@ const userController = {
         return like.destroy()
       })
       .then(() => res.redirect('back'))
-      .catch(err => next(err))
+      .catch(next)
   },
   getTopUsers: (req, res, next) => {
     // 撈出所有 User 與 followers 資料
