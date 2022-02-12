@@ -22,6 +22,42 @@ const userController = {
     userServices.signUp(req, (err, data) => {
       err ? next(err) : res.json({ status: 'success', data })
     })
+  },
+  getUser: (req, res, next) => {
+    userServices.getUser(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  editUser: (req, res, next) => {
+    userServices.editUser(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  putUser: (req, res, next) => {
+    userServices.putUser(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  addFavorite: (req, res, next) => {
+    userServices.addFavorite(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  removeFavorite: (req, res, next) => {
+    userServices.removeFavorite(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  addLike: (req, res, next) => {
+    userServices.addLike(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  removeLike: (req, res, next) => {
+    userServices.removeLike(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  getTopUsers: (req, res, next) => {
+    userServices.getTopUsers(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  addFollowing: (req, res, next) => {
+    userServices.addFollowing(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  removeFollowing: (req, res, next) => {
+    userServices.removeFollowing(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  likeComment: (req, res, next) => {
+    userServices.likeComment(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  unlikeComment: (req, res, next) => {
+    userServices.unlikeComment(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
   }
 }
 
