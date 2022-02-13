@@ -107,10 +107,10 @@ const adminServices = {
           openingHours,
           description,
           image: filePath || restaurant.image,
-          categoryId
+          categoryId: Number(categoryId)
         })
       })
-      .then(updatedRestaurant => cb(null, { updatedRestaurant }))
+      .then(updatedRestaurant => cb(null, { restaurant: updatedRestaurant }))
       .catch(err => cb(err))
   },
   getUsers: (req, cb) => {
@@ -145,7 +145,7 @@ const adminServices = {
         return user.update({ isAdmin: !user.isAdmin })
       })
       .then(updatedUser => {
-        return cb(null, { updatedUser })
+        return cb(null, { user: updatedUser })
       })
       .catch(err => cb(err))
   }
